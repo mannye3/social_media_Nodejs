@@ -168,6 +168,8 @@ userSchema.pre("findOne", async function (next){
     })
   }
 
+  //fjfjfjjf
+
     if(numberOfPosts > 20){
     await User.findByIdAndUpdate(userId, {
       userAward: 'Gold',
