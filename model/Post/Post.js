@@ -17,7 +17,7 @@ const postSchema = mongoose.Schema({
     category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Category",
-        required: [true, "Category is required"]
+       // required: [true, "Category is required"]
     },
 
 
@@ -54,7 +54,7 @@ user:[{
 photo:
 {
     type: String,
-    required : [true, "Post image is required"]
+    // required : [true, "Post image is required"]
 },
 
 

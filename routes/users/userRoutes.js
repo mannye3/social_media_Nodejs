@@ -1,9 +1,14 @@
 const express = require("express");
-const { userRegisterCtrl, userLoginCtrl, usersCtrl, userProfileCtrl, userDeleteCtrl, useUpdateCtrl } = require("../../controllers/users/userCtrl");
+const { userRegisterCtrl, userLoginCtrl, usersCtrl, userProfileCtrl, userDeleteCtrl, useUpdateCtrl, profilePhotoUploaddCtrl, whoViewedMyProfileCtrl, followingCtrl, unFollowCtrl,blockUsersCtrl,unblockUsersCtrl, AdminblockUserCtrl,AdminUnBlockUserCtrl } = require("../../controllers/users/userCtrl");
 const isLogin = require("../../middlewares/isLogin");
-
+const storage = require("../../config/cloudinary");
+const multer = require("multer");
+const isAdmin = require("../../middlewares/isAdmin");
 const userRouter = express.Router();
 
+
+
+const upload = multer ({storage})
 // POST /api/v1/users/register
 userRouter.post("/register", userRegisterCtrl);
 
@@ -16,10 +21,48 @@ userRouter.get("/", usersCtrl);
 // GET /api/v1/users/profile/:id
 userRouter.get("/profile/", isLogin, userProfileCtrl);
 
+
 // DELETE /api/v1/users/:id
 userRouter.delete("/:id", userDeleteCtrl);
 
 // PUT /api/v1/users/:id
 userRouter.put("/:id", useUpdateCtrl);
+
+
+
+// GET /api/v1/users/profile-viewers/:id
+userRouter.get("/profile-viewers/:id",isLogin, whoViewedMyProfileCtrl);
+
+
+// GET /api/v1/users/following/:id
+userRouter.get("/following/:id",isLogin, followingCtrl);
+
+
+// GET /api/v1/users/following/:id
+userRouter.get("/unfollow/:id",isLogin, unFollowCtrl);
+
+// GET /api/v1/users/following/:id
+userRouter.get("/blocked/:id",isLogin, blockUsersCtrl);
+
+
+userRouter.get("/unblocked/:id",isLogin, unblockUsersCtrl);
+
+userRouter.put("/adminblock/:id",isLogin, isAdmin, AdminblockUserCtrl);
+
+
+
+userRouter.put("/adminunblock/:id",isLogin, isAdmin, AdminUnBlockUserCtrl);
+
+
+
+
+
+
+
+// POST /api/v1/users/:id
+userRouter.post("/profile-photo-upload",isLogin, upload.single("profile"), profilePhotoUploaddCtrl);
+
+
+
 
 module.exports = userRouter;
