@@ -1,5 +1,5 @@
 const express = require("express");
-const { userRegisterCtrl, userLoginCtrl, usersCtrl, userProfileCtrl, userDeleteCtrl, useUpdateCtrl, profilePhotoUploaddCtrl, whoViewedMyProfileCtrl, followingCtrl, unFollowCtrl,blockUsersCtrl,unblockUsersCtrl, AdminblockUserCtrl,AdminUnBlockUserCtrl } = require("../../controllers/users/userCtrl");
+const { userRegisterCtrl, userLoginCtrl, usersCtrl, userProfileCtrl, updateUserCtrl, profilePhotoUploaddCtrl, whoViewedMyProfileCtrl, followingCtrl, unFollowCtrl,blockUsersCtrl,unblockUsersCtrl, AdminblockUserCtrl,AdminUnBlockUserCtrl,updatePasswordCtrl,deleteUserCtrl } = require("../../controllers/users/userCtrl");
 const isLogin = require("../../middlewares/isLogin");
 const storage = require("../../config/cloudinary");
 const multer = require("multer");
@@ -22,11 +22,20 @@ userRouter.get("/", usersCtrl);
 userRouter.get("/profile/", isLogin, userProfileCtrl);
 
 
-// DELETE /api/v1/users/:id
-userRouter.delete("/:id", userDeleteCtrl);
+
 
 // PUT /api/v1/users/:id
-userRouter.put("/:id", useUpdateCtrl);
+userRouter.put("/",isLogin, updateUserCtrl);
+
+
+// PUT /api/v1/users/:id
+userRouter.put("/updatepassword",isLogin, updatePasswordCtrl);
+
+
+// PUT /api/v1/users/:id
+userRouter.delete("/deleteuser",isLogin, deleteUserCtrl);
+
+
 
 
 

@@ -3,6 +3,9 @@ const User = require("../../model/User/User");
 const generateToken = require('../../utils/generateToken');
 const getTokenFromHeader = require('../../utils/getTokenFromHeader');
 const {appErr, AppErr} = require('../../utils/appErr');
+const Post = require('../../model/Post/Post');
+const Category = require('../../model/Category/Category');
+const Comment = require('../../model/Comment/Comment');
 
 
 
@@ -242,16 +245,7 @@ const whoViewedMyProfileCtrl = async(req,res,next) =>{
 
 
 
-const userDeleteCtrl = async(req,res,next) =>{
-    try {
-        res.json({
-            status: "success",
-            data: "Delete User route"
-        })
-    } catch (error) {
-        res.json(error.message)
-    }
-}
+
 
 
 
@@ -378,16 +372,117 @@ const profilePhotoUploaddCtrl = async(req,res) =>{
 
 
 
-const useUpdateCtrl = async(req,res) =>{
-    try {
+const updateUserCtrl = async(req,res,next) =>{
+    const {email, firstname, lastname} = req.body;
+        try {
+        if(email){
+            const emailTaken = await User.findOne({email})
+            if(emailTaken){
+                return next(appErr('Email is taken'))
+            }
+        }
+
+        const user  = await User.findByIdAndUpdate(req.userAuth, {
+            lastname,
+            firstname,
+            email
+
+        },{
+            new:true,
+            runValidators: true
+
+        })
         res.json({
             status: "success",
-            data: "Update user route"
+            data: user
         })
     } catch (error) {
         res.json(error.message)
     }
 }
+
+
+
+const updatePasswordCtrl = async(req,res,next) =>{
+    const {password} = req.body
+    try {
+        if(password){
+            const salt = await  bcrypt.genSalt(10)
+            const hashPassword = await bcrypt.hash(password, salt)
+
+             await User.findByIdAndUpdate(
+                req.userAuth,
+                {password: hashPassword},
+                {new: true, runValidators: true}
+            )
+             res.json({
+            status: "success",
+            data: "Password has been updated"
+        })
+        }else{
+            return next(appErr("Please provide password field"))
+        }
+       
+    } catch (error) {
+        res.json(error.message)
+    }
+}
+
+
+
+const deleteUserCtrl = async (req, res, next) => {
+  try {
+    // 1. Find the user to be deleted
+    const userToDelete = await User.findById(req.userAuth);
+
+    if (!userToDelete) {
+      return res.status(404).json({
+        status: "error",
+        message: "User not found",
+      });
+    }
+
+    // 2. Find and delete all posts of the user
+    await Post.deleteMany({ user: req.userAuth });
+    // 3. Find and delete all comments of the user
+    await Comment.deleteMany({ user: req.userAuth });
+    // 4. Find and delete all categories of the user
+    await Category.deleteMany({ user: req.userAuth });
+    // 5. Delete the user
+    await userToDelete.deleteOne();
+
+    // Send response
+    return res.json({
+      status: "success",
+      data: "Your account has been deleted successfully",
+    });
+  } catch (error) {
+    next(appErr(error.message));
+  }
+};
+
+
+
+
+
+// const deleteUserCtrl = async(req,res,next) =>{
+
+//     try {
+//         const userTodelete = await User.findById(req.userAuth)
+
+//         await  Post.deleteMany({user: req.userAuth})
+//         await  Comment.deleteMany({user: req.userAuth})
+//         await  Category.deleteMany({user: req.userAuth})
+
+//         await userTodelete.delete()
+//          res.json({
+//             status: "success",
+//             data: "Your account has been deleted successfully"
+//         })
+//     } catch (error) {
+//         res.json(error.message)
+//     }
+// }
 
 
 
@@ -400,8 +495,8 @@ module.exports = {
     userLoginCtrl,
     usersCtrl,
     userProfileCtrl,
-    userDeleteCtrl,
-    useUpdateCtrl,
+    updateUserCtrl,
+    updatePasswordCtrl,
     profilePhotoUploaddCtrl,
     whoViewedMyProfileCtrl,
     followingCtrl,
@@ -409,6 +504,7 @@ module.exports = {
     blockUsersCtrl,
     unblockUsersCtrl,
     AdminblockUserCtrl,
-    AdminUnBlockUserCtrl
+    AdminUnBlockUserCtrl,
+    deleteUserCtrl
     
 }

@@ -97,7 +97,9 @@ userSchema.pre("findOne", async function (next){
   const posts = await Post.find({user: userId})
   const lastPost = posts[posts.length - 1]
 
-  const lastPostDate = new Date(lastPost.createdAt)
+  
+  //const lastPostDate = new Date(lastPost.createdAt)
+  const lastPostDate = new Date(lastPost?.createdAt)
   const lastPostDateStr = lastPostDate.toDateString()
 
 
@@ -167,8 +169,7 @@ userSchema.pre("findOne", async function (next){
       new:true
     })
   }
-
-  //fjfjfjjf
+  
 
     if(numberOfPosts > 20){
     await User.findByIdAndUpdate(userId, {
