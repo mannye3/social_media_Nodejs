@@ -6,7 +6,7 @@ const User = require("../../model/User/User")
 
 
 
-const createpostCtrl = async(req,res) =>{
+const createpostCtrl = async(req,res,next) =>{
     const {title, description} = req.body;
     try {
         const author = await User.findById(req.userAuth)
@@ -22,14 +22,15 @@ const createpostCtrl = async(req,res) =>{
             data: postCreated
         })
     } catch (error) {
-        res.json(error.message)
+    next(appErr(error.message))
+
     }
 }
 
 
 
 
-const postsCtrl = async(req,res) =>{
+const postsCtrl = async(req,res,next) =>{
     try {
         const posts = await Post.find()
         res.json({
@@ -37,7 +38,8 @@ const postsCtrl = async(req,res) =>{
             data: posts
         })
     } catch (error) {
-        res.json(error.message)
+     next(appErr(error.message))
+
     }
 }
 

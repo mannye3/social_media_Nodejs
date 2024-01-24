@@ -31,13 +31,14 @@ const userRegisterCtrl = async(req,res,next) =>{
             data: user
         })
     } catch (error) {
-       // res.json(error.message)
-       next(appErr(error.message))
+        next(appErr(error.message))
+       // 
+       //next(appErr(error.message))
     }
 }
 
 //Login
-const userLoginCtrl = async(req,res) =>{
+const userLoginCtrl = async(req,res,next) =>{
     const {email,password} = req.body
     
     try {
@@ -45,9 +46,8 @@ const userLoginCtrl = async(req,res) =>{
         const userFound = await User.findOne({email})
       
          if(!userFound){
-            return res.json({
-                msg: "Invalid login credentials"
-            })
+            return next(appErr("Invalid login credentials"))
+           
          }
     
 
@@ -55,9 +55,10 @@ const userLoginCtrl = async(req,res) =>{
          const isPasswordMatched = await bcrypt.compare(password, userFound.password)
 
          if(!isPasswordMatched){
-            return res.json({
-                msg: "Invalid login credentials"
-            })
+             return next(appErr("Invalid login credentials"))
+            // return res.json({
+            //     msg: "Invalid login credentials"
+            // })
          }
     
 
@@ -72,13 +73,15 @@ const userLoginCtrl = async(req,res) =>{
             }
         })
     } catch (error) {
-        res.json(error.message)
+        next(appErr(error.message))
+       // next(appErr(error.message))
+       // 
     }
 }
 
 
 
-const userProfileCtrl = async(req,res) =>{
+const userProfileCtrl = async(req,res,next) =>{
    
     try {
         const user = await User.findById(req.userAuth).populate("posts")
@@ -87,7 +90,8 @@ const userProfileCtrl = async(req,res) =>{
             data: user
         })
     } catch (error) {
-        res.json(error.message)
+        next(appErr(error.message))
+        
     }
 }
 
@@ -98,7 +102,7 @@ const userProfileCtrl = async(req,res) =>{
 
 
 
-const usersCtrl = async(req,res) =>{
+const usersCtrl = async(req,res,next) =>{
     try {
         const users = await User.find()
         res.json({
@@ -106,7 +110,8 @@ const usersCtrl = async(req,res) =>{
             data: users
         })
     } catch (error) {
-        res.json(error.message)
+        next(appErr(error.message))
+        
     }
 }
 
@@ -133,7 +138,8 @@ const blockUsersCtrl = async(req,res, next) =>{
        }
         
     } catch (error) {
-        res.json(error.message)
+        next(appErr(error.message))
+        
     }
 }
 
@@ -164,14 +170,15 @@ const unblockUsersCtrl = async(req,res, next) =>{
        }
         
     } catch (error) {
-        res.json(error.message)
+        next(appErr(error.message))
+        
     }
 }
 
 
 
 
-const AdminblockUserCtrl = async(req,res) =>{
+const AdminblockUserCtrl = async(req,res,next) =>{
     try {
         const userToBlocked = await User.findById(req.params.id)
 
@@ -186,13 +193,14 @@ const AdminblockUserCtrl = async(req,res) =>{
             data: "User Blocked successfully"
         })
     } catch (error) {
-        res.json(error.message)
+        next(appErr(error.message))
+        
     }
 }
 
 
 
-const AdminUnBlockUserCtrl = async(req,res) =>{
+const AdminUnBlockUserCtrl = async(req,res,next) =>{
     try {
         const userToUnBlocked = await User.findById(req.params.id)
 
@@ -207,7 +215,8 @@ const AdminUnBlockUserCtrl = async(req,res) =>{
             data: "User Unblocked successfully"
         })
     } catch (error) {
-        res.json(error.message)
+        next(appErr(error.message))
+        
     }
 }
 
@@ -239,7 +248,8 @@ const whoViewedMyProfileCtrl = async(req,res,next) =>{
 
        
     } catch (error) {
-        res.json(error.message)
+    next(appErr(error.message))
+
     }
 }
 
@@ -281,7 +291,8 @@ const followingCtrl = async(req,res,next) =>{
 
        
     } catch (error) {
-        res.json(error.message)
+        next(appErr(error.message))
+       
     }
 }
 
@@ -324,13 +335,14 @@ const unFollowCtrl = async(req,res,next) =>{
 
         
     } catch (error) {
-        res.json(error.message)
+        next(appErr(error.message))
+        
     }
 }
 
 
 
-const profilePhotoUploaddCtrl = async(req,res) =>{
+const profilePhotoUploaddCtrl = async(req,res, next) =>{
     try {
 
         const userToUpdate = await User.findById(req.userAuth)
@@ -366,7 +378,8 @@ const profilePhotoUploaddCtrl = async(req,res) =>{
      
     } catch (error) {
         next(appErr(erro.message, 500))
-        // res.json(error.message)
+       // next(appErr(error.message))
+        // 
     }
 }
 
@@ -397,7 +410,8 @@ const updateUserCtrl = async(req,res,next) =>{
             data: user
         })
     } catch (error) {
-        res.json(error.message)
+        next(appErr(error.message))
+        
     }
 }
 
@@ -424,7 +438,8 @@ const updatePasswordCtrl = async(req,res,next) =>{
         }
        
     } catch (error) {
-        res.json(error.message)
+        next(appErr(error.message))
+        
     }
 }
 
@@ -457,32 +472,12 @@ const deleteUserCtrl = async (req, res, next) => {
       data: "Your account has been deleted successfully",
     });
   } catch (error) {
-    next(appErr(error.message));
+    next(appErr(error.message))
+
   }
 };
 
 
-
-
-
-// const deleteUserCtrl = async(req,res,next) =>{
-
-//     try {
-//         const userTodelete = await User.findById(req.userAuth)
-
-//         await  Post.deleteMany({user: req.userAuth})
-//         await  Comment.deleteMany({user: req.userAuth})
-//         await  Category.deleteMany({user: req.userAuth})
-
-//         await userTodelete.delete()
-//          res.json({
-//             status: "success",
-//             data: "Your account has been deleted successfully"
-//         })
-//     } catch (error) {
-//         res.json(error.message)
-//     }
-// }
 
 
 

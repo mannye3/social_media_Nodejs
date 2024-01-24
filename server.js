@@ -1,6 +1,7 @@
 const express = require("express");
 const userRouter = require("./routes/users/userRoutes");
 const postRouter = require("./routes/posts/postRoutes");
+const categoryRouter = require("./routes/categories/categoryRoutes");
 
 const globalErrHandler = require("./middlewares/globalErrHandler");
 
@@ -21,6 +22,7 @@ app.use(express.json())
 //users routes
 app.use("/api/v1/users/", userRouter)
 app.use("/api/v1/posts/", postRouter)
+app.use("/api/v1/categories/", categoryRouter)
 
 
 app.use(globalErrHandler)
